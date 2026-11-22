@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Hunger Games</title>
+  <style>
+    :root {
+      --bg: #14110f;
+      --surface: #1f1a17;
+      --text: #f3ece4;
+      --muted: #b8aca0;
+      --accent: #e8792b;
+      --accent-soft: rgba(232, 121, 43, 0.15);
+      --border: #3a302a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.0625rem;
+      line-height: 1.7;
+    }
+
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 20px 64px;
+    }
+
+    header {
+      text-align: center;
+      padding: 72px 20px 56px;
+      background: radial-gradient(ellipse at top, rgba(232, 121, 43, 0.25), transparent 70%);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    .eyebrow {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(2.25rem, 9vw, 4rem);
+      line-height: 1.1;
+      font-weight: normal;
+      letter-spacing: -0.01em;
+    }
+
+    .author {
+      margin-top: 12px;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    section { margin-bottom: 56px; }
+
+    h2 {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 0.875rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    p + p { margin-top: 1em; }
+
+    .reasons {
+      list-style: none;
+      display: grid;
+      gap: 16px;
+    }
+
+    .reasons li {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
+      display: flex;
+      gap: 16px;
+    }
+
+    .num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+    }
+
+    .reasons h3 {
+      font-size: 1.125rem;
+      margin-bottom: 4px;
+    }
+
+    .reasons p { color: var(--muted); }
+
+    blockquote {
+      border-left: 3px solid var(--accent);
+      padding: 8px 0 8px 24px;
+    }
+
+    blockquote p {
+      font-size: clamp(1.375rem, 5vw, 1.75rem);
+      line-height: 1.4;
+      font-style: italic;
+    }
+
+    blockquote cite {
+      display: block;
+      margin-top: 12px;
+      color: var(--muted);
+      font-style: normal;
+      font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 480px) {
+      header { padding: 48px 16px 40px; margin-bottom: 36px; }
+      main { padding: 0 16px 48px; }
+      section { margin-bottom: 44px; }
+      .reasons li { padding: 16px; gap: 12px; }
+      blockquote { padding-left: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">A book I love</p>
+    <h1>The Hunger Games</h1>
+    <p class="author">by Suzanne Collins</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Summary</h2>
+      <p>
+        In the nation of Panem, built on the ruins of North America, the powerful Capitol
+        rules over twelve poor districts. Every year, each district must send one boy and
+        one girl to fight to the death in the Hunger Games, a televised event meant to
+        remind everyone who is in charge.
+      </p>
+      <p>
+        When her little sister Prim is chosen, sixteen-year-old Katniss Everdeen of
+        District 12 volunteers to take her place. Thrown into the arena with Peeta Mellark,
+        the baker's son, Katniss has to rely on her hunting skills and her wits to stay
+        alive, all while figuring out who she can trust and how to play to the cameras.
+      </p>
+    </section>
+
+    <section>
+      <h2>Three reasons I recommend it</h2>
+      <ul class="reasons">
+        <li>
+          <span class="num">1</span>
+          <div>
+            <h3>It's impossible to put down</h3>
+            <p>Short chapters and cliffhanger endings make every page pull you into the next one.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <div>
+            <h3>Katniss is an unforgettable heroine</h3>
+            <p>She's tough, resourceful, and fiercely loyal to her family, but she's also unsure of herself, which makes her feel real.</p>
+          </div>
+        </li>
+        <li>
+          <span class="num">3</span>
+          <div>
+            <h3>It makes you think</h3>
+            <p>Beneath the action, it raises real questions about power, inequality, and how entertainment can make people stop noticing cruelty.</p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Favorite quotation</h2>
+      <blockquote>
+        <p>“Happy Hunger Games! And may the odds be ever in your favor.”</p>
+        <cite>— Effie Trinket</cite>
+      </blockquote>
+    </section>
+
+    <footer>
+      <p>Made with love for a favorite book.</p>
+    </footer>
+  </main>
+</body>
+</html>
