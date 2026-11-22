@@ -1,0 +1,152 @@
+:: StoryTitle
+A Day in the Life
+
+
+:: StoryData
+{
+  "ifid": "75EF7485-7D49-479A-8F66-0C354FB5D9D2",
+  "format": "Harlowe",
+  "format-version": "3.3.9",
+  "start": "M01 Alarm",
+  "zoom": 1
+}
+
+
+:: SYS Init [startup]
+{
+(set: $name to "Jordan")
+(set: $stress to 25)
+(set: $energy to 70)
+(set: $minutesLate to 0)
+(set: $money to 40)
+(set: $choices to (dm:
+  "pressedShirt", false,
+  "snoozed", false,
+  "tookRideshare", false
+))
+(set: $log to (a:))
+(set: $showStats to true)
+}
+
+
+:: SYS StatBar [footer]
+{
+(set: $stress to (max: 0, (min: 100, $stress)))
+(set: $energy to (max: 0, (min: 100, $energy)))
+(if: $showStats)[
+  <hr>
+  ''Stress'' $stress / 100 &nbsp;·&nbsp; ''Energy'' $energy / 100 &nbsp;·&nbsp; ''Wallet'' (print: "$" + (str: $money))
+  <br>(display: "SYS Mood")
+]
+}
+
+
+:: SYS Mood
+{
+(if: $stress >= 75)[//Your jaw has been clenched for an hour.//]
+(else-if: $stress >= 50)[//Your shoulders are up around your ears.//]
+(else-if: $energy <= 25)[//Running on fumes.//]
+(else:)[//Steady. For now.//]
+}
+
+
+:: M01 Alarm [act-morning]
+6:42 AM. The alarm cuts through a dream you can't hold onto.
+
+Today is the presentation, the one your manager called "a real opportunity to get some visibility." You've rehearsed it in the shower all week.
+
+Your good blue shirt is still draped over the chair, wrinkled from the dryer.
+
+[[Get up and iron the shirt->M02a Iron the Shirt]]
+[[Hit snooze. Ten more minutes.->M02b Snooze]]
+
+
+:: M02a Iron the Shirt [act-morning]
+{
+(set: $energy to it - 10)
+(set: $stress to it - 10)
+(set: $choices's pressedShirt to true)
+(set: $log to it + (a: "You got up early and pressed your shirt."))
+}
+The iron hisses. You take your time with the collar the way your grandmother taught you: points first, then the band.
+
+It's a small thing. But you've learned the small things get noticed when you'd rather they didn't.
+
+[[Head out->M03 Out the Door]]
+
+
+:: M02b Snooze [act-morning]
+{
+(set: $energy to it + 15)
+(set: $stress to it + 15)
+(set: $minutesLate to it + 12)
+(set: $choices's snoozed to true)
+(set: $log to it + (a: "You took the extra sleep."))
+}
+7:04. You bolt upright. Your body thanks you; your schedule doesn't.
+
+No time for the iron. You pull the shirt on and smooth it with your palms, like that's ever worked.
+
+[[Head out->M03 Out the Door]]
+
+
+:: M03 Out the Door [act-morning]
+(if: $choices's pressedShirt)[You catch yourself in the hallway mirror: crisp collar, clean lines. You look like someone who belongs in the room. You wish you didn't have to check.]
+(else:)[You catch yourself in the hallway mirror: creases across the chest. You tug at them twice, then make yourself stop.]
+
+(if: $minutesLate > 10)[
+The 7:40 bus is already turning onto your block.
+
+[[Run for the bus->C01 Running for the Bus]]
+(if: $money >= 18)[[[Order a rideshare (eighteen bucks)->C01 Rideshare]]]
+]
+(else:)[
+You've got time. The morning air is cool.
+
+[[Walk to the stop->C01 Bus Stop]]
+(if: $energy >= 50)[[[Stop at the corner shop for coffee->C01 Corner Shop]]]
+]
+
+
+:: C01 Running for the Bus [act-commute stub]
+TODO: Running in work clothes, in public. How do people on the street react?
+
+[[Continue->W01 Arrival]]
+
+
+:: C01 Rideshare [act-commute stub]
+{
+(set: $money to it - 18)
+(set: $choices's tookRideshare to true)
+}
+TODO: The driver hesitates at the pickup.
+
+[[Continue->W01 Arrival]]
+
+
+:: C01 Bus Stop [act-commute stub]
+TODO: Familiar faces at the stop.
+
+[[Continue->W01 Arrival]]
+
+
+:: C01 Corner Shop [act-commute stub]
+TODO: The owner knows your order. A new security guard doesn't know you.
+
+[[Continue->W01 Arrival]]
+
+
+:: W01 Arrival [act-work stub]
+TODO: Workplace act begins.
+
+[[Skip to evening->E01 Reflection]]
+
+
+:: E01 Reflection [act-evening]
+The apartment is quiet. You replay the day.
+
+(for: each _entry, ...$log)[- _entry
+]
+
+(if: $stress >= 70)[You don't sleep much.]
+(else:)[You sleep, eventually.]
