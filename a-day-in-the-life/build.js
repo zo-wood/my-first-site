@@ -63,8 +63,9 @@ const storyData =
   `<tw-storydata name="${esc(title)}" startnode="${startIdx + 1}" creator="Twine" creator-version="2.10.0" ` +
   `format="${esc(data.format)}" format-version="${esc(data["format-version"])}" ifid="${esc(data.ifid)}" ` +
   `options="" tags="" zoom="${data.zoom || 1}" hidden>` +
-  `<style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">${esc(css)}</style>` +
-  `<script role="script" id="twine-user-script" type="text/twine-javascript">${esc(js)}</script>` +
+  // Story CSS/JS go in raw (as Twine does); only guard against closing tags.
+  `<style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">${css.replace(/<\/style/gi, "<\\/style")}</style>` +
+  `<script role="script" id="twine-user-script" type="text/twine-javascript">${js.replace(/<\/script/gi, "<\\/script")}</script>` +
   passageXml + `</tw-storydata>`;
 
 // --- Load story format (JSONP: window.storyFormat({...})) ---
