@@ -7,146 +7,1340 @@ A Day in the Life
   "ifid": "75EF7485-7D49-479A-8F66-0C354FB5D9D2",
   "format": "Harlowe",
   "format-version": "3.3.9",
-  "start": "M01 Alarm",
+  "start": "TITLE",
   "zoom": 1
 }
 
 
 :: SYS Init [startup]
 {
-(set: $name to "Jordan")
-(set: $stress to 25)
+(set: $health to 70)
 (set: $energy to 70)
-(set: $minutesLate to 0)
+(set: $happiness to 55)
 (set: $money to 40)
+(set: $prep to 0)
+(set: $minutesLate to 0)
+(set: $clock to "")
+(set: $place to "")
 (set: $choices to (dm:
   "pressedShirt", false,
   "snoozed", false,
-  "tookRideshare", false
+  "tookRideshare", false,
+  "presentation", "none",
+  "spokeUp", false,
+  "fired", false,
+  "offer", false,
+  "route", "none",
+  "scrolled", false,
+  "committee", false,
+  "barbershop", false
 ))
 (set: $log to (a:))
-(set: $showStats to true)
+(set: $places to (dm:
+  "scene-bedroom", "Your apartment",
+  "scene-street", "Your block",
+  "scene-bus", "Bus stop, Halsey & 5th",
+  "scene-shop", "Kim's Corner Market",
+  "scene-office", "Meridian Analytics, 14th floor",
+  "scene-night", "The old block",
+  "scene-home", "Your kitchen table",
+  "scene-car", "Dre's gray Camry",
+  "scene-warehouse", "Warehouse, Dock 9",
+  "scene-gang", "Fulton Street",
+  "scene-suburb", "Years later",
+  "scene-struggle", "Years later",
+  "scene-prison", "Years later",
+  "scene-death", ""
+))
 }
 
 
-:: SYS StatBar [footer]
+:: SYS HUD [footer]
 {
-(set: $stress to (max: 0, (min: 100, $stress)))
+(set: $health to (max: 0, (min: 100, $health)))
 (set: $energy to (max: 0, (min: 100, $energy)))
-(if: $showStats)[
-  <hr>
-  ''Stress'' $stress / 100 &nbsp;·&nbsp; ''Energy'' $energy / 100 &nbsp;·&nbsp; ''Wallet'' (print: "$" + (str: $money))
-  <br>(display: "SYS Mood")
+(set: $happiness to (max: 0, (min: 100, $happiness)))
+(set: _tags to (passage:)'s tags)
+(if: $health <= 0 and not (_tags contains "ending"))[(goto: "END Gone Too Soon")]
+(unless: _tags contains "nohud")[
+(set: $place to "")
+(for: each _t, ..._tags)[(if: $places contains _t)[(set: $place to $places's (_t))]]
+<div class="hud">
+<div class="where">$place(if: $clock is not "")[ · $clock]</div>
+<div class="meter health"><span>Health</span><div class="track">(css: "width:" + (str: $health) + "%")[<i></i>]</div><b>$health</b></div>
+<div class="meter energy"><span>Energy</span><div class="track">(css: "width:" + (str: $energy) + "%")[<i></i>]</div><b>$energy</b></div>
+<div class="meter happiness"><span>Happiness</span><div class="track">(css: "width:" + (str: $happiness) + "%")[<i></i>]</div><b>$happiness</b></div>
+<div class="money"><span>Money</span> <b>(print: "$" + (str: $money))</b></div>
+</div>
 ]
 }
 
 
-:: SYS Mood
+:: SYS Gallery
 {
-(if: $stress >= 75)[//Your jaw has been clenched for an hour.//]
-(else-if: $stress >= 50)[//Your shoulders are up around your ears.//]
-(else-if: $energy <= 25)[//Running on fumes.//]
-(else:)[//Steady. For now.//]
+(set: _slots to (a: "ending-suburban", "ending-struggle", "ending-prison", "ending-gang", "ending-death"))
+(set: _names to (a: "Excellence", "The Struggle", "The System", "The Crew", "Gone Too Soon"))
+(set: _hints to (a:
+  "Prepare like it matters. Then say yes when the right door opens.",
+  "Do everything right. Or almost right.",
+  "Some favors take the fast road.",
+  "Some favors pay. Then they ask for more.",
+  "Your body keeps a ledger. So does the street."
+))
+(set: _found to (find: _s where (saved-games:) contains _s, ..._slots)'s length)
+<div class="gallery"><div class="gtitle">Endings found: _found of 5</div>
+(for: each _i, ...(range: 1, 5))[(if: (saved-games:) contains _slots's (_i))[<div class="end found">✦ (print: _names's (_i))</div>](else:)[<div class="end locked">??? <small>(print: _hints's (_i))</small></div>]]
+</div>
 }
 
 
-:: M01 Alarm [act-morning]
-6:42 AM. The alarm cuts through a dream you can't hold onto.
+:: SYS Ending Footer
+<div class="recap">''How you got here''(for: each _entry, ...$log)[<br>· _entry]</div>
+(display: "SYS Gallery")
+(link: "Play again")[(restart:)]
+
+
+:: TITLE [nohud scene-title music-title]
+<div class="title-card"><h1>A Day in the Life</h1><p class="tagline">One morning. One city. Every choice weighs something.</p></div>
+You are Jordan, twenty-four. You've got a job downtown, a mother across town, a cousin with offers, and four things you can't stop counting: ''health'', ''energy'', ''happiness'', and ''money''.
+
+Some days decide whole lives. Five lives can grow out of this one. Play it again and again to find them all.
+
+(display: "SYS Gallery")
+[[Begin the day->M01 Alarm]]
+
+<span class="hint">Music starts when you tap. Use the ♪ button to mute.</span>
+
+
+:: M01 Alarm [scene-bedroom music-morning]
+{(set: $clock to "6:42 AM")}
+The alarm cuts through a dream you can't hold onto.
 
 Today is the presentation, the one your manager called "a real opportunity to get some visibility." You've rehearsed it in the shower all week.
+
+Your phone lights up on the nightstand. Two messages.
+
+''Mom:'' //Pharmacy says my insurance lapsed. Don't worry about it baby, I'll figure it out. Good luck today!!//
+
+''Dre:'' //yo cuz. got something easy tonight. five hundred cash. hit me//
 
 Your good blue shirt is still draped over the chair, wrinkled from the dryer.
 
 [[Get up and iron the shirt->M02a Iron the Shirt]]
 [[Hit snooze. Ten more minutes.->M02b Snooze]]
+[[Check your phone first->M02c Scroll]]
 
 
-:: M02a Iron the Shirt [act-morning]
+:: M02a Iron the Shirt [scene-bedroom music-morning]
 {
+(set: $clock to "6:58 AM")
 (set: $energy to it - 10)
-(set: $stress to it - 10)
+(set: $health to it - 5)
+(set: $happiness to it + 5)
+(set: $prep to it + 1)
 (set: $choices's pressedShirt to true)
-(set: $log to it + (a: "You got up early and pressed your shirt."))
+(set: $log to it + (a: "Got up early and pressed the shirt."))
 }
 The iron hisses. You take your time with the collar the way your grandmother taught you: points first, then the band.
 
 It's a small thing. But you've learned the small things get noticed when you'd rather they didn't.
 
+No time for breakfast. Your stomach will file a complaint later.
+
 [[Head out->M03 Out the Door]]
 
 
-:: M02b Snooze [act-morning]
+:: M02b Snooze [scene-bedroom music-morning]
 {
+(set: $clock to "7:04 AM")
 (set: $energy to it + 15)
-(set: $stress to it + 15)
+(set: $health to it + 5)
 (set: $minutesLate to it + 12)
 (set: $choices's snoozed to true)
-(set: $log to it + (a: "You took the extra sleep."))
+(set: $log to it + (a: "Took the extra sleep."))
 }
-7:04. You bolt upright. Your body thanks you; your schedule doesn't.
+You bolt upright. Your body thanks you. Your schedule does not.
 
-No time for the iron. You pull the shirt on and smooth it with your palms, like that's ever worked.
+No time for the iron. You pull the shirt on and smooth it with your palms, like that has ever worked.
 
 [[Head out->M03 Out the Door]]
 
 
-:: M03 Out the Door [act-morning]
+:: M03 Out the Door [scene-street music-street]
+{(set: $clock to (cond: $choices's snoozed, "7:31 AM", "7:20 AM"))}
 (if: $choices's pressedShirt)[You catch yourself in the hallway mirror: crisp collar, clean lines. You look like someone who belongs in the room. You wish you didn't have to check.]
 (else:)[You catch yourself in the hallway mirror: creases across the chest. You tug at them twice, then make yourself stop.]
 
-(if: $minutesLate > 10)[
-The 7:40 bus is already turning onto your block.
+(if: $minutesLate > 10)[The 7:40 bus is already turning onto your block.
 
 [[Run for the bus->C01 Running for the Bus]]
-(if: $money >= 18)[[[Order a rideshare (eighteen bucks)->C01 Rideshare]]]
-]
-(else:)[
-You've got time. The morning air is cool.
+(if: $money >= 18)[[[Order a rideshare (eighteen bucks)->C01 Rideshare]]]]
+(else:)[You've got time. The air is cool and smells like the bakery two streets over.
 
-[[Walk to the stop->C01 Bus Stop]]
-(if: $energy >= 50)[[[Stop at the corner shop for coffee->C01 Corner Shop]]]
-]
+[[Walk to the bus stop->C01 Bus Stop]]
+(if: $energy >= 50)[[[Stop at the corner shop for coffee->C01 Corner Shop]]](else:)[//You're too drained for a detour.//]]
 
 
-:: C01 Running for the Bus [act-commute stub]
-TODO: Running in work clothes, in public. How do people on the street react?
+:: C01 Running for the Bus [scene-street music-tense]
+{(set: $clock to "7:38 AM")}
+You break into a jog, then a run, laptop bag slapping your hip. Half a block from the stop, a patrol car slows beside you and keeps pace.
 
-[[Continue->W01 Arrival]]
+The window comes down. ''"Morning. Where you headed in such a hurry?"''
+
+You know this moment. Everyone who loves you taught you this moment: hands where they can see them, voice low, nothing sudden.
+
+[[Stay calm. Explain. Hands visible.->C02 Stay Calm]]
+[[“Officer, am I being detained?”->C02 Know Your Rights]]
 
 
-:: C01 Rideshare [act-commute stub]
+:: C02 Stay Calm [scene-street music-tense]
 {
-(set: $money to it - 18)
-(set: $choices's tookRideshare to true)
+(set: $clock to "7:52 AM")
+(set: $happiness to it - 10)
+(set: $energy to it - 10)
+(set: $minutesLate to it + 15)
+(set: $log to it + (a: "Got stopped running for the bus. Stayed calm."))
 }
-TODO: The driver hesitates at the pickup.
+You explain: the bus, the job, the presentation. He asks for ID. You move slowly, narrating every motion like a nature documentary. He runs it. You wait.
 
-[[Continue->W01 Arrival]]
+"Been some break-ins around here. You understand."
 
+You say you understand. The bus is long gone.
 
-:: C01 Bus Stop [act-commute stub]
-TODO: Familiar faces at the stop.
+You did everything right. It still cost you fifteen minutes and something you don't have a word for.
 
-[[Continue->W01 Arrival]]
-
-
-:: C01 Corner Shop [act-commute stub]
-TODO: The owner knows your order. A new security guard doesn't know you.
-
-[[Continue->W01 Arrival]]
+[[Walk the rest of the way->W01 Arrival]]
 
 
-:: W01 Arrival [act-work stub]
-TODO: Workplace act begins.
+:: C02 Know Your Rights [scene-street music-tense]
+{
+(set: $clock to "8:05 AM")
+(set: $happiness to it - 5)
+(set: $health to it - 5)
+(set: $minutesLate to it + 25)
+(set: $log to it + (a: "Got stopped running for the bus. Asked if you were being detained."))
+}
+His jaw tightens. "Just a few questions."
 
-[[Skip to evening->E01 Reflection]]
+You ask again, calm and polite, exactly like the videos. He calls a second unit. You spend twenty-five minutes on the curb while neighbors watch through their blinds.
+
+Eventually: "You're free to go. Have a good day."
+
+You were right. Being right took twenty-five minutes, and your hands are still shaking.
+
+[[Walk the rest of the way->W01 Arrival]]
 
 
-:: E01 Reflection [act-evening]
-The apartment is quiet. You replay the day.
+:: C01 Rideshare [scene-street music-street]
+{
+(set: $clock to "7:41 AM")
+(set: $money to it - 18)
+(set: $minutesLate to it + 4)
+(set: $happiness to it + 10)
+(set: $choices's tookRideshare to true)
+(set: $log to it + (a: "Paid for a rideshare."))
+}
+The first driver gets within two blocks, sits there for a minute, and cancels.
 
-(for: each _entry, ...$log)[- _entry
-]
+The second is Ms. Pat. Gospel station turned up, a pine air freshener, and a rule that you have to tell her what the presentation is about.
 
-(if: $stress >= 70)[You don't sleep much.]
-(else:)[You sleep, eventually.]
+You tell her. She nods like you've told her something holy. "Baby, you go in there and show them."
+
+[[Go show them->W01 Arrival]]
+
+
+:: C01 Bus Stop [scene-bus music-street]
+{(set: $clock to "7:28 AM")}
+The usual faces. Ms. Gloria is wrestling three grocery bags and her grandson Malik, who is wrestling a juice box.
+
+The bus is four minutes out.
+
+[[Help Ms. Gloria with her bags->C02 Help Gloria]]
+[[Earbuds in. Rehearse one more time.->C02 Rehearse]]
+
+
+:: C02 Help Gloria [scene-bus music-street]
+{
+(set: $clock to "7:34 AM")
+(set: $energy to it - 5)
+(set: $happiness to it + 10)
+(set: $log to it + (a: "Helped Ms. Gloria with her bags."))
+}
+You take two bags. Malik asks what you do at your job.
+
+"I make charts that tell rich people what to do."
+
+He laughs so hard the juice comes out his nose. Ms. Gloria squeezes your arm. "Your grandmother would be proud of you."
+
+[[Ride downtown->W01 Arrival]]
+
+
+:: C02 Rehearse [scene-bus music-street]
+{
+(set: $clock to "7:34 AM")
+(set: $prep to it + 1)
+(set: $happiness to it - 5)
+(set: $log to it + (a: "Rehearsed instead of helping Ms. Gloria."))
+}
+You run the slides in your head. On the third pass you finally nail the transition between the revenue chart and the forecast.
+
+You notice Ms. Gloria dropping an orange only after the doors close. You notice it all the way downtown.
+
+[[Ride downtown->W01 Arrival]]
+
+
+:: C01 Corner Shop [scene-shop music-street]
+{
+(set: $clock to "7:26 AM")
+(set: $money to it - 4)
+(set: $energy to it + 15)
+}
+Mr. Kim has your order going before you're through the door. Large, black, one sugar, a hand-written "good luck" on the cup because he remembers you mentioned today.
+
+There's a new security guard. He follows you from the coffee to the snacks to the register, one aisle behind, the whole way.
+
+[[Say something to the guard->C02 Speak to Guard]]
+[[Let it go. Pay. Leave.->C02 Let It Go]]
+
+
+:: C02 Speak to Guard [scene-shop music-street]
+{
+(set: $clock to "7:33 AM")
+(set: $happiness to it + 5)
+(set: $energy to it - 5)
+(set: $minutesLate to it + 5)
+(set: $log to it + (a: "Called out the guard who followed you."))
+}
+"Is there a problem?"
+
+He stiffens. Before he can answer, Mr. Kim leans over the counter. "Jordan? Been coming here since grade school. Go watch the door."
+
+The guard mumbles something that might be an apology. You'll take it.
+
+[[Catch the bus->W01 Arrival]]
+
+
+:: C02 Let It Go [scene-shop music-street]
+{
+(set: $clock to "7:29 AM")
+(set: $happiness to it - 10)
+(set: $log to it + (a: "Let it go when the guard followed you."))
+}
+You pay. You smile at Mr. Kim. You leave.
+
+The coffee tastes fine. You don't.
+
+[[Catch the bus->W01 Arrival]]
+
+
+:: W01c Conference Room [scene-office music-work]
+{(set: $clock to (cond: $minutesLate > 20, "9:24 AM", $minutesLate > 10, "9:08 AM", "8:52 AM"))}
+(if: $minutesLate > 20)[{(set: $happiness to it - 5)}Greg is waiting at your desk. "Cutting it close on the big day, huh?" He's smiling. It isn't a smile.]
+(else-if: $minutesLate > 10)[You slide into your chair just as the meeting reminder pings.]
+(else:)[{(set: $prep to it + 1)}You're early. You get one last clean run-through in an empty conference room, and it goes well.]
+
+Conference Room B. Twelve chairs. You are the only person in the room who looks like you. You stopped noticing that years ago. You have never stopped noticing that.
+
+[[Present->W02 Presentation]]
+
+
+:: W02 Presentation [scene-office music-work]
+{
+(set: $clock to "10:00 AM")
+(set: _score to $prep + (cond: $energy >= 50, 1, 0) - (cond: $minutesLate > 20, 1, 0))
+(if: _score >= 3)[(set: $choices's presentation to "great")(set: $happiness to it + 15)]
+(else-if: _score >= 1)[(set: $choices's presentation to "okay")(set: $happiness to it + 5)]
+(else:)[(set: $choices's presentation to "rough")(set: $happiness to it - 15)]
+(set: $log to it + (a: (cond: $choices's presentation is "great", "Nailed the presentation.", $choices's presentation is "okay", "Gave an okay presentation.", "Struggled through the presentation.")))
+}
+(if: $choices's presentation is "great")[Something clicks. The numbers land, the room leans in, and when Ms. Okafor, the vice president who never speaks in these meetings, asks a question, you already have the slide for it.]
+(else-if: $choices's presentation is "okay")[It's fine. You hit your points. One chart gets a nod. Nobody is dazzled; nobody is disappointed.]
+(else:)[Your mind keeps snagging on the morning. You lose your place twice. You hear yourself apologizing more than presenting.]
+
+Afterward, Kyle from your team repeats your main idea back to the room like it just occurred to him.
+
+"Great point, Kyle," says Greg. Then, to you, warmly: "And hey, very articulate today."
+
+[[Correct the record, politely->W03 Speak Up]]
+[[Let it slide->W03 Let It Slide]]
+
+
+:: W03 Speak Up [scene-office music-work]
+{
+(set: $clock to "10:40 AM")
+(set: $happiness to it + 5)
+(set: $energy to it - 5)
+(set: $choices's spokeUp to true)
+(set: $log to it + (a: "Spoke up when Kyle took credit."))
+}
+"Actually, that's from slide six. Happy to walk through the data behind it."
+
+Ms. Okafor's eyebrow goes up, at Kyle. Greg's smile tightens a notch.
+
+(if: $choices's presentation is "rough")[Later, in the hallway, Greg says, "Maybe focus on your own delivery before correcting other people." He says it nicely. That's the worst part.]
+
+[[Lunch->W04 Lunch]]
+
+
+:: W03 Let It Slide [scene-office music-work]
+{
+(set: $clock to "10:40 AM")
+(set: $happiness to it - 10)
+(set: $health to it - 5)
+(set: $log to it + (a: "Let it slide when Kyle took credit."))
+}
+You file it with all the others.
+
+The file is getting heavy. You feel it in your shoulders, in your jaw, in the headache that starts behind your left eye.
+
+[[Lunch->W04 Lunch]]
+
+
+:: W04 Lunch [scene-office music-work]
+{(set: $clock to "12:15 PM")}
+Your phone buzzes. Mom.
+
+The pharmacy wants three hundred forty dollars for her blood pressure pills. She's going to "stretch them" until payday.
+
+"Don't you dare send me money. I mean it. How did the presentation go?"
+
+You tell her it went (print: $choices's presentation). You don't tell her what's in your account.
+
+[[Skip lunch. Work through it.->W04a Skip Lunch]]
+[[Grab lunch with Tasha from accounting->W04b Lunch with Tasha]]
+
+
+:: W04a Skip Lunch [scene-office music-work]
+{
+(set: $clock to "1:30 PM")
+(set: $health to it - 15)
+(set: $energy to it - 10)
+(set: $happiness to it - 5)
+(set: $log to it + (a: "Skipped lunch."))
+}
+You eat a granola bar from your drawer that expired in spring and answer forty-one emails.
+
+By two o'clock your hands are a little unsteady. You blame the coffee.
+
+[[Back to your desk->W04c Greg's Ask]]
+
+
+:: W04b Lunch with Tasha [scene-office music-work]
+{
+(set: $clock to "1:30 PM")
+(set: $money to it - 12)
+(set: $health to it + 5)
+(set: $energy to it + 10)
+(set: $happiness to it + 10)
+(set: $log to it + (a: "Ate lunch with Tasha."))
+}
+Tasha listens to the whole Kyle story with her fork frozen in the air.
+
+"Kyle does that to everybody," she says. "He just does it more to you."
+
+She laughs. You laugh. It doesn't fix anything, but it helps.
+
+[[Back to your desk->W04c Greg's Ask]]
+
+
+:: W05 End of Day [scene-office music-work]
+{
+(set: $clock to "4:50 PM")
+(set: $choices's fired to ($choices's presentation is "rough" and $minutesLate > 20))
+}
+(if: $choices's fired)[{(set: $happiness to it - 25)(set: $log to it + (a: "Got let go."))}Greg calls you into a small room. There's a woman from HR on the screen. The word she uses is "restructuring." The real words were "late" and "rough," and you both know it.
+
+Your badge stops working at 5:15. Your last check will be mailed.]
+(else-if: $choices's presentation is "great")[{(set: $happiness to it + 10)(set: $choices's offer to true)(set: $log to it + (a: "Got invited to apply for Emerging Leaders."))}An email from Ms. Okafor:
+
+//Impressive work today. We're opening applications for the Emerging Leaders program: rotations, mentorship, a real path upward. Applications close at midnight. I'd like to see yours.//
+
+You read it four times.]
+(else:)[You close the laptop. Another day. Nobody says anything, which at Meridian counts as a good review.]
+
+[[Head home->E00 Walk Home]]
+
+
+:: E01 Evening [scene-night music-night]
+{(set: $clock to "6:40 PM")}
+Dre is leaning on a black Charger outside the laundromat like he's been waiting for you specifically. He has.
+
+"Cuz! You get my text?"
+
+The job: drive a backpack across town to a man on Fulton Street. Use his other car, the gray Camry. One hour. Five hundred dollars.
+
+"You got a clean record, a clean car, a clean face. Nobody looks twice at you."
+
+You think about Mom stretching her pills.(if: $choices's fired)[ You think about rent, and the badge that stopped working.] You have (print: "$" + (str: $money)) to your name.
+
+[[Take the job->E02 The Run]]
+[[“Not tonight, Dre.”->E02 Turn It Down]]
+(unless: (history:) contains "E01a Ask Dre")[[[“What's in the bag, Dre?”->E01a Ask Dre]]]
+
+
+:: E02 Turn It Down [scene-home music-night]
+{
+(set: $clock to "7:30 PM")
+(set: $log to it + (a: "Turned down Dre's job."))
+}
+Dre shrugs and daps you up. "Aight. Offer stands." No hard feelings. He's still family.
+
+Home. Kitchen table. The fridge hums. The evening is yours, for whatever that's worth.
+
+(if: $choices's offer and $energy >= 25)[[[Write the Emerging Leaders application->E03 Application]]]
+(else-if: $choices's offer)[//The application is open on your laptop, but your eyes won't focus. You're running on empty.//]
+[[Pick up a night shift at the warehouse->E03 Night Shift]]
+[[Call Mom, then sleep->E03 Rest]]
+
+
+:: E03 Application [scene-home music-night]
+{
+(set: $clock to "11:58 PM")
+(set: $energy to it - 20)
+(set: $happiness to it + 10)
+(set: $log to it + (a: "Wrote the application and hit submit at 11:58."))
+}
+You write about your grandmother's ironing. About charts that tell rich people what to do. About being the only one in the room, and deciding that's a reason to stay in it.
+
+At 11:58 you hit submit. Then you sit very still and listen to your heart.
+
+[[Six weeks later->END Excellence]]
+
+
+:: E03 Night Shift [scene-warehouse music-tense]
+{
+(set: $clock to "2:10 AM")
+(set: $money to it + 120)
+(set: $energy to it - 30)
+(set: $health to it - 20)
+(set: $log to it + (a: "Worked a night shift at the warehouse."))
+}
+Scanner, box, conveyor. Scanner, box, conveyor. The quota counter on the wall never stops blinking.
+
+(if: $health <= 35)[Around two, a tightness starts in your chest. Then your left arm goes heavy and strange. The supervisor is yelling about the rate.
+
+You need this money. You need every dollar of it.
+
+[[Push through. It'll pass.->END Gone Too Soon]]
+[[Sit down. Tell someone.->E04 Sit Down]]]
+(else:)[Your back is screaming by the end, but the hundred and twenty clears. You send Mom enough for half her pills and tell her it was a bonus.
+
+[[The years go by->END The Struggle]]]
+
+
+:: E04 Sit Down [scene-warehouse music-night]
+{
+(set: $clock to "4:30 AM")
+(set: $health to it + 15)
+(set: $happiness to it - 10)
+(set: $log to it + (a: "Sat down when your chest got tight. It was a warning."))
+}
+Luis from Dock 8 sits with you on an overturned crate until the ambulance comes.
+
+The ER doctor says it's a warning: exhaustion, blood pressure, stress. "You're young. Take care of yourself." The bill comes later. It's more than the shift paid, times nine.
+
+But you're alive to be angry about it.
+
+[[The years go by->END The Struggle]]
+
+
+:: E03 Rest [scene-home music-night]
+{
+(set: $clock to "9:45 PM")
+(set: $health to it + 15)
+(set: $energy to it + 20)
+(set: $happiness to it + 5)
+(set: $log to it + (a: "Called Mom and went to bed early."))
+}
+Mom talks for forty minutes about her neighbor's new boyfriend and doesn't mention the pills once, which is how you know she's worried.
+
+You fall asleep with the phone still on your chest.
+
+[[The years go by->END The Struggle]]
+
+
+:: E02 The Run [scene-car music-tense]
+{
+(set: $clock to "7:05 PM")
+(set: $choices's route to "dre")
+(set: $log to it + (a: "Took Dre's job."))
+}
+Dre hands you the keys to the gray Camry and a black backpack, zipped, heavier than it looks.
+
+"Don't open it. Don't speed. Don't be interesting."
+
+The backpack sits on the passenger seat. You don't look at it. You can feel it anyway.
+
+[[Take the highway. Faster.->E03 Highway]]
+[[Take the back streets. Slower, fewer cops.->E03 Back Streets]]
+
+
+:: E03 Highway [scene-car music-tense]
+{(set: $clock to "7:22 PM")}
+Blue lights fill the mirror.
+
+The officer says your rear taillight is out. Dre's car. Dre's taillight.
+
+"License and registration. Mind if I take a look inside the vehicle?"
+
+[[“Go ahead.”->E04 Consent]]
+[[“I don't consent to searches.”->E04 Refuse]]
+
+
+:: E04 Consent [scene-car music-tense]
+{
+(set: $clock to "7:31 PM")
+(set: $happiness to it - 40)
+(set: $log to it + (a: "Got pulled over. Consented to the search."))
+}
+It takes him less than a minute to unzip the backpack.
+
+The cuffs are colder than you thought they'd be.
+
+[[What comes next->END The System]]
+
+
+:: E04 Refuse [scene-car music-tense]
+{
+(set: $clock to "8:15 PM")
+(set: $happiness to it - 40)
+(set: $log to it + (a: "Got pulled over. Refused the search."))
+}
+You say it the way the videos say to. He says that's fine, and calls for a K-9 unit. You wait forty minutes on the shoulder while trucks shake the car.
+
+The dog sits down next to the passenger door.
+
+You did everything right, except the one thing.
+
+[[What comes next->END The System]]
+
+
+:: E03 Back Streets [scene-car music-tense]
+{
+(set: $clock to "7:51 PM")
+(set: $money to it + 500)
+(set: $happiness to it + 5)
+(set: $log to it + (a: "Delivered Dre's backpack and got paid."))
+}
+Every stop sign, every streetlight, you do it perfect. A man named Tone takes the backpack without a word and hands you an envelope that makes your whole jacket feel heavy.
+
+Back at the laundromat, Dre is grinning. "See? Easy."
+
+Then the grin goes away. "Look. Kingston boys been pushing on our block. I need people I trust. Real money. Every week."
+
+[[Take the money. “This was one time.”->E04 One Time]]
+[[“I'm in.”->E04 All In]]
+
+
+:: E04 One Time [scene-night music-night]
+{
+(set: $clock to "9:10 PM")
+(set: $choices's route to "once")
+(set: $money to it - 340)
+(set: $happiness to it + 10)
+(set: $log to it + (a: "Paid Mom's pharmacy bill with Dre's money. Said never again."))
+}
+Dre nods slowly. "Respect."
+
+You pay Mom's pharmacy bill from your phone in the laundromat parking lot. She calls you crying and asks where you got it.
+
+"Bonus at work," you say. It's the first time you've ever lied to her like that.
+
+[[The years go by->END The Struggle]]
+
+
+:: E04 All In [scene-gang music-gang]
+{
+(set: $clock to "11:40 PM")
+(set: $choices's route to "gang")
+(set: $happiness to it + 5)
+(set: $log to it + (a: "Told Dre you were in."))
+}
+That same night you're on the corner with Dre and three others. The block is loud and warm and for an hour it feels like being sixteen again, like belonging somewhere without having to earn it.
+
+Then a car from Kingston rolls by slow. It stops. Two of them get out. Words, then a shove. Dre stumbles into you.
+
+Under the folding table, someone presses something heavy into your hand.
+
+[[Pull Dre back. Walk away.->END The Crew]]
+[[Step forward.->END Gone Too Soon]]
+
+
+:: M02c Scroll [scene-bedroom music-morning]
+{
+(set: $clock to "7:06 AM")
+(set: $happiness to it - 10)
+(set: $minutesLate to it + 8)
+(set: $choices's scrolled to true)
+(set: $log to it + (a: "Doomscrolled before getting out of bed."))
+}
+You only mean to check the weather.
+
+Instead: a video from another city. A traffic stop. A man about your age, hands on the wheel, voice calm, and then not. (either: "Four million views.", "The comments are a war.", "Your group chat has already posted it three times.")
+
+You watch it twice. You don't mean to.
+
+When you finally put the phone down, the shirt is still wrinkled, you're running behind, and you feel like you've already lived through something today.
+
+[[Get dressed and go->M03 Out the Door]]
+
+
+:: W01 Arrival [scene-office music-work]
+{(set: $clock to (cond: $minutesLate > 20, "9:18 AM", $minutesLate > 10, "9:02 AM", "8:45 AM"))}
+The lobby of Meridian Analytics: marble, a fountain nobody looks at, a security guard who's new this month.
+
+He waves three people in suits through the turnstile without looking up. When you get there, he holds up a hand. "Badge?"
+
+You've worked here two years. Your badge is on a lanyard around your neck, in plain view.
+
+When the elevator opens, a woman from the twelfth floor glances at you and moves her purse to her other shoulder.
+
+[[Show the badge, smile, take the elevator->W01a Elevator]]
+[[Take the stairs. All fourteen floors.->W01b Stairs]]
+
+
+:: W01a Elevator [scene-office music-work]
+{
+(set: $happiness to it - 5)
+(set: $log to it + (a: "Took the elevator and made it comfortable for everyone else."))
+}
+You say good morning. She says good morning back, a beat too late.
+
+Twelve floors of silence. You've done this ride a thousand times, and you're always the one who has to make it feel normal.
+
+[[Fourteenth floor->W01c Conference Room]]
+
+
+:: W01b Stairs [scene-office music-work]
+{
+(set: $energy to it - 15)
+(set: $health to it + 5)
+(set: $minutesLate to it + 3)
+(set: $log to it + (a: "Took fourteen flights of stairs instead of the elevator."))
+(if: $choices's pressedShirt)[(set: $prep to it - 1)]
+}
+By the ninth floor your shirt is sticking to your back. By the fourteenth you're breathing hard, but you're alone, and alone is easier.
+
+(if: $choices's pressedShirt)[So much for the crisp collar.]
+
+[[Fourteenth floor->W01c Conference Room]]
+
+
+:: W04c Greg's Ask [scene-office music-work]
+{(set: $clock to "3:15 PM")}
+Greg leans into your cubicle, both hands on the wall like he's about to give you a gift.
+
+"So, leadership wants to relaunch the Diversity and Belonging committee. We all thought you'd be perfect to lead it. It's volunteer, technically, but it's //great// visibility."
+
+[[“Happy to help.”->W04d Committee Yes]]
+[[“I'd rather be known for my work.”->W04e Committee No]]
+
+
+:: W04d Committee Yes [scene-office music-work]
+{
+(set: $energy to it - 10)
+(set: $happiness to it - 5)
+(set: $choices's committee to true)
+(set: $log to it + (a: "Agreed to lead the diversity committee, unpaid."))
+}
+You'll plan the Juneteenth lunch. You'll write the survey nobody fills out. You'll field every question about race from coworkers who have never asked you about anything else.
+
+But Ms. Okafor copies herself on the announcement email, and that's something.
+
+[[Five o'clock->W05 End of Day]]
+
+
+:: W04e Committee No [scene-office music-work]
+{
+(set: $happiness to it + 5)
+(set: $log to it + (a: "Turned down the unpaid diversity committee."))
+}
+"Totally get it!" says Greg. He doesn't.
+
+By four o'clock the committee has been offered to Danielle from marketing, the only other Black employee on your floor. She texts you a single eye-roll emoji. You send one back. Solidarity.
+
+[[Five o'clock->W05 End of Day]]
+
+
+:: E00 Walk Home [scene-night music-night]
+{(set: $clock to "6:10 PM")}
+The bus drops you two blocks early. The neighborhood is doing its evening thing: bass from a parked car, kids on scooters, somebody's grill going.
+
+(either: "A church choir is practicing through an open window, the same eight bars over and over.", "Two old men outside the liquor store are arguing about basketball like a life depends on it.", "Somebody's grandmother yells a name down the block, and three different kids answer.", "The ice cream truck plays its song too slowly, like it's tired too.")
+
+(if: $money >= 20)[[[Stop at Lou's barbershop->E00a Barbershop]]]
+(if: $energy >= 20)[[[Shoot around at the court->E00b Court]]]
+[[Go straight home->E01 Evening]]
+
+
+:: E00a Barbershop [scene-shop music-street]
+{
+(set: $clock to "6:30 PM")
+(set: $money to it - 20)
+(set: $happiness to it + 15)
+(set: $choices's barbershop to true)
+(set: $log to it + (a: "Got a cut at Lou's."))
+}
+Lou's has been on this corner for thirty-one years. Three chairs, one TV, and a debate that never ends.
+
+Today it's whether a hot dog is a sandwich. Big Earl says no with his whole chest.
+
+While Lou lines you up, Earl lowers his voice. "Saw your cousin's car out front of the laundromat again. Whatever Dre's selling, it costs more than he's charging. You hear me?"
+
+You hear him.
+
+[[Walk the last block->E01 Evening]]
+
+
+:: E00b Court [scene-night music-street]
+{
+(set: $clock to "6:35 PM")
+(set: $energy to it - 10)
+(set: $health to it + 5)
+(set: $happiness to it + 10)
+(set: $log to it + (a: "Played pickup at the court."))
+}
+Some teenagers let you into their game mostly so they can roast your work shoes. Then you hit three in a row, and the roasting turns into respect, and then back into roasting.
+
+A squad car does a slow lap around the court. The game pauses. Nobody says anything. It drives off. The game starts again like nothing happened, because nothing did, this time.
+
+[[Walk the last block->E01 Evening]]
+
+
+:: E01a Ask Dre [scene-night music-night]
+Dre's smile doesn't move, but his eyes do.
+
+"Better you don't know. That's the whole point, cuz. You don't know, you can't say."
+
+He holds out the keys. "So?"
+
+[[Take the job->E02 The Run]]
+[[“Not tonight, Dre.”->E02 Turn It Down]]
+
+
+:: END Excellence [ending scene-suburb music-suburb]
+{(set: $clock to "")(set: _saved to (save-game: "ending-suburban", "Excellence"))}
+<div class="ending-label">Ending · Excellence</div>
+Six weeks later, the email says //Congratulations//. Two years after that, a title with "Manager" in it. Five years after that, a house with a lawn, on a street named after the trees they cut down to build it.
+
+Mom visits on Sundays and says the quiet takes getting used to. You paid off her prescriptions the first month and never let her mention them again.
+
+(if: $choices's committee)[You also chaired the diversity committee for three years, unpaid. It's on your résumé under "Leadership." It belongs under "Labor."
+
+]You're good at this life. You know which voice to use in which room. You know how to laugh at the joke at the neighborhood barbecue so nobody's uncomfortable, including you. Mostly including you.
+
+Some Saturdays you drive back to the old block just to buy coffee from Mr. Kim. You tell yourself it's for the coffee.
+
+You made it. You're still careful. You will always be careful.
+
+(display: "SYS Ending Footer")
+
+
+:: END The Struggle [ending scene-struggle music-struggle]
+{(set: $clock to "")(set: _saved to (save-game: "ending-struggle", "The Struggle"))}
+<div class="ending-label">Ending · The Struggle</div>
+(if: $choices's fired)[The job doesn't come back. Unemployment takes three weeks to start, then there's the warehouse, then a second job at the airport.]
+(else-if: $choices's route is "once")[The five hundred covers Mom's pills and nothing else. You never take another job from Dre. You never stop wondering whether anybody saw you.]
+(else:)[You keep the job at Meridian. Greg keeps calling you articulate. Kyle gets promoted first, then again.]
+
+Two jobs. A car that runs on prayer and duct tape. Rent paid on the fifth of every month like a ritual. Your back hurts in a way that has started to feel permanent.
+
+But there are Sunday dinners. There's Malik's high school graduation, where you cheer the loudest. (if: $choices's barbershop)[There's Lou, who still cuts your hair for half price and still won't let you pay the other half. ]There's Tasha's laugh, and Ms. Gloria's sweet potato pie, and the corner of the couch that's shaped like you.
+
+Nobody makes movies about this life. It isn't a tragedy. It's a Tuesday. It's most people.
+
+(if: $happiness >= 50)[Some days you even mean it when you say you're blessed.](else:)[Some days are just weight, and you carry it anyway.]
+
+(display: "SYS Ending Footer")
+
+
+:: END The System [ending scene-prison music-prison]
+{(set: $clock to "")(set: _saved to (save-game: "ending-prison", "The System"))}
+<div class="ending-label">Ending · The System</div>
+What was in the backpack makes it a felony with a mandatory minimum. Dre's lawyer stops returning your calls the second week. The public defender has kind eyes and a hundred and forty other cases.
+
+You take the plea. Six years.
+
+Mom rides two buses every other Saturday to sit across a bolted-down table from you. She never once asks why. That's worse than if she did.
+
+Kyle told you once, laughing, about the summer he sold weed out of his college dorm. He's a manager now.
+
+When you get out, every job application has the box. You check it. Every time, you check it.
+
+One choice at a quarter to seven. Not the worst choice anyone in the city made that day. Just the one that got caught.
+
+(display: "SYS Ending Footer")
+
+
+:: END The Crew [ending scene-gang music-gang]
+{(set: $clock to "")(set: _saved to (save-game: "ending-gang", "The Crew"))}
+<div class="ending-label">Ending · The Crew</div>
+You pull Dre back by the collar. The Kingston car pulls off laughing. Nobody gets hurt that night.
+
+But you're in now. The money is real. The first time you buy Mom something without checking the price, you have to go sit in the car for a minute.
+
+The loyalty is real too. So are the funerals. You learn to own a black suit that fits.
+
+Years later, you see Malik at the bus stop, almost grown. He looks at your car like it's the future. You want to tell him it isn't. You don't know how to say it in a way he'd believe, because at his age you wouldn't have believed it either.
+
+You found family. It just never stopped asking for more.
+
+(display: "SYS Ending Footer")
+
+
+:: END Gone Too Soon [ending scene-death music-death]
+{(set: $clock to "")(set: _saved to (save-game: "ending-death", "Gone Too Soon"))}
+<div class="ending-label">Ending · Gone Too Soon</div>
+(if: $choices's route is "gang")[You step forward. Everything after happens faster than thinking. The sound is smaller than it is in movies.
+
+Then there's only the sky, orange from the streetlights, and Dre's voice getting very far away, saying your name like he's trying to keep you from leaving.]
+(else:)[You push through. The tightness becomes a fist. Luis finds you between the racks at Dock 9.
+
+The doctors say heart. They say stress. They say you should have come in sooner. Nobody mentions what coming in sooner would have cost.]
+
+Mr. Kim closes the shop the day of the funeral. Ms. Gloria brings a pie nobody can eat. Malik wears a tie for the first time.
+
+Mom keeps your good blue shirt. She irons it once a year, collar first, the way her mother taught both of you.
+
+Twenty-four. A whole life was still in front of you, and every version of it mattered.
+
+(display: "SYS Ending Footer")
+
+
+:: Story Stylesheet [stylesheet]
+html, body { background: #000; margin: 0; }
+tw-story {
+  background: transparent !important;
+  color: #f3ede4;
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: 1.12rem;
+  line-height: 1.65;
+  width: auto !important;
+  max-width: 44rem;
+  margin: 0 auto !important;
+  padding: 7.5rem 16px 4rem !important;
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+tw-passage {
+  display: block;
+  background: rgba(10, 10, 14, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  padding: 2.4rem 1.6rem 1.5rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+tw-passage { position: relative; }
+tw-sidebar {
+  position: absolute !important; top: 0.6rem; left: 0.7rem; z-index: 2;
+  width: auto !important; height: auto !important; padding: 0 !important; margin: 0 !important;
+  display: flex; gap: 0.6rem; color: #f3ede4; opacity: 0.55;
+}
+tw-sidebar tw-icon { font-size: 1.1rem !important; line-height: 1; height: auto !important; }
+tw-link, .enchantment-link {
+  display: inline-block;
+  color: #ffc56b !important;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  margin: 0.2rem 0;
+  border: 1px solid rgba(255, 197, 107, 0.45);
+  border-radius: 8px;
+  background: rgba(255, 197, 107, 0.08);
+  transition: background 0.2s, color 0.2s;
+}
+tw-link:hover, .enchantment-link:hover { background: rgba(255, 197, 107, 0.22); color: #fff !important; }
+
+.hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem 1.2rem;
+  padding: 0.55rem 16px 0.65rem;
+  background: rgba(0, 0, 0, 0.72);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font: 600 0.75rem/1.2 system-ui, -apple-system, "Segoe UI", sans-serif;
+  letter-spacing: 0.03em; color: #eee;
+}
+.hud .where { flex: 1 1 100%; font-weight: 500; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.7rem; }
+.meter { display: flex; align-items: center; gap: 0.45rem; flex: 1 1 9rem; }
+.meter span, .money span { opacity: 0.75; }
+.meter .track { flex: 1; height: 7px; min-width: 3rem; background: rgba(255, 255, 255, 0.14); border-radius: 4px; overflow: hidden; }
+.meter .track tw-hook { display: block; height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+.meter b { min-width: 1.6rem; text-align: right; font-variant-numeric: tabular-nums; }
+.health .track tw-hook { background: #ef6461; }
+.energy .track tw-hook { background: #f2c14e; }
+.happiness .track tw-hook { background: #5cc8a1; }
+.money b { color: #9fe3b0; font-variant-numeric: tabular-nums; }
+
+.title-card { text-align: center; margin: 0.5rem 0 1.5rem; }
+.title-card h1 { font-size: 2.4rem; line-height: 1.1; margin: 0 0 0.4rem; letter-spacing: 0.01em; }
+.tagline { margin: 0; opacity: 0.75; font-style: italic; }
+.hint { display: block; margin-top: 1rem; font-size: 0.85rem; opacity: 0.6; }
+
+.ending-label {
+  display: inline-block; margin-bottom: 0.8rem; padding: 0.25rem 0.7rem;
+  font: 700 0.75rem/1.2 system-ui, sans-serif; letter-spacing: 0.12em; text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 999px;
+}
+.recap { margin-top: 1.5rem; padding: 1rem 1.1rem; border-radius: 10px; background: rgba(255, 255, 255, 0.05); font-size: 0.95rem; }
+.gallery { margin: 1.25rem 0; padding: 1rem 1.1rem; border-radius: 10px; background: rgba(255, 255, 255, 0.05); font-size: 0.95rem; }
+.gallery .gtitle { font: 700 0.8rem/1.2 system-ui, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.5rem; opacity: 0.85; }
+.gallery .end { padding: 0.3rem 0; border-top: 1px solid rgba(255, 255, 255, 0.07); }
+.gallery .found { color: #ffd98a; font-weight: 600; }
+.gallery .locked { opacity: 0.7; }
+.gallery small { display: block; font-size: 0.85rem; font-style: italic; opacity: 0.85; }
+
+.scene-layer { position: fixed; inset: 0; z-index: 0; opacity: 0; transition: opacity 1.4s ease; pointer-events: none; }
+#music-toggle {
+  position: fixed; right: 16px; bottom: 16px; z-index: 30;
+  font: 600 0.8rem/1 system-ui, sans-serif; color: #fff;
+  background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px; padding: 0.55rem 0.9rem; cursor: pointer;
+}
+@media (max-width: 600px) {
+  tw-story { padding-top: 9rem !important; font-size: 1.05rem; }
+  tw-passage { padding: 2.2rem 1.1rem 1.2rem; }
+  .meter { flex-basis: 40%; }
+}
+
+
+:: Story JavaScript [script]
+(function () {
+  "use strict";
+  if (window.__dayInTheLife) return;
+  window.__dayInTheLife = true;
+
+  /* =================== SCENERY =================== */
+  function rng(seed) {
+    var s = seed % 2147483647;
+    if (s <= 0) s += 2147483646;
+    return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+  }
+  function f(n) { return n.toFixed(1); }
+  function svgUrl(inner, ratio) {
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" preserveAspectRatio="' +
+      (ratio || "xMidYMax meet") + '">' + inner + "</svg>";
+    return 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+  }
+  function skyline(fill, win, seed, density, minH, maxH) {
+    var r = rng(seed), x = 0, out = "";
+    minH = minH || 90; maxH = maxH || 300;
+    while (x < 1200) {
+      var w = 50 + r() * 90, h = minH + r() * (maxH - minH), y = 400 - h;
+      out += '<rect x="' + f(x) + '" y="' + f(y) + '" width="' + f(w + 0.6) + '" height="' + f(h) + '" fill="' + fill + '"/>';
+      if (win) {
+        for (var wy = y + 14; wy < 385; wy += 20)
+          for (var wx = x + 10; wx < x + w - 12; wx += 15)
+            if (r() < density) out += '<rect x="' + f(wx) + '" y="' + f(wy) + '" width="6" height="9" fill="' + win + '"/>';
+      }
+      x += w;
+    }
+    return out;
+  }
+  function stars(seed, n, color) {
+    var r = rng(seed), out = "";
+    for (var i = 0; i < n; i++)
+      out += '<circle cx="' + f(r() * 1200) + '" cy="' + f(r() * 380) + '" r="' + f(0.6 + r() * 1.4) +
+        '" fill="' + (color || "#fff") + '" opacity="' + f(0.3 + r() * 0.6) + '"/>';
+    return out;
+  }
+  var GLOW = '<defs><radialGradient id="g"><stop offset="0" stop-color="#ffd58a" stop-opacity=".8"/>' +
+    '<stop offset="1" stop-color="#ffd58a" stop-opacity="0"/></radialGradient></defs>';
+  function streetlights(pole) {
+    var out = GLOW;
+    for (var x = 120; x < 1200; x += 300) {
+      out += '<circle cx="' + (x + 30) + '" cy="215" r="70" fill="url(#g)"/>';
+      out += '<rect x="' + x + '" y="210" width="5" height="190" fill="' + pole + '"/>';
+      out += '<rect x="' + x + '" y="208" width="34" height="5" fill="' + pole + '"/>';
+      out += '<circle cx="' + (x + 32) + '" cy="216" r="5" fill="#ffe7b3"/>';
+    }
+    return out;
+  }
+  function houses() {
+    var r = rng(21), out = '<path d="M0 340 Q300 310 600 335 T1200 330 V400 H0Z" fill="#6e9f5d"/>';
+    for (var i = 0; i < 6; i++) {
+      var x = 30 + i * 200, w = 130, y = 270 + r() * 20, body = ["#f2e6d0", "#d9e4ec", "#efd9c7"][i % 3];
+      out += '<circle cx="' + (x - 20) + '" cy="' + (y + 10) + '" r="' + f(28 + r() * 14) + '" fill="#4f7d43"/>';
+      out += '<rect x="' + x + '" y="' + f(y) + '" width="' + w + '" height="' + f(345 - y) + '" fill="' + body + '"/>';
+      out += '<polygon points="' + (x - 10) + "," + f(y) + " " + (x + w / 2) + "," + f(y - 45) + " " + (x + w + 10) + "," + f(y) + '" fill="#7a5a4a"/>';
+      out += '<rect x="' + (x + 18) + '" y="' + f(y + 18) + '" width="26" height="22" fill="#ffe2a0"/>';
+      out += '<rect x="' + (x + w - 44) + '" y="' + f(y + 18) + '" width="26" height="22" fill="#ffe2a0"/>';
+      out += '<rect x="' + (x + w / 2 - 11) + '" y="' + f(345 - 40) + '" width="22" height="40" fill="#5a4034"/>';
+    }
+    out += '<rect x="0" y="352" width="1200" height="4" fill="#fff" opacity=".7"/>';
+    for (var p = 0; p < 1200; p += 24) out += '<rect x="' + p + '" y="340" width="4" height="24" fill="#fff" opacity=".7"/>';
+    return out;
+  }
+  function shelves(colors, shelf, seed) {
+    var r = rng(seed), out = "";
+    for (var y = 80; y <= 360; y += 70) {
+      out += '<rect x="0" y="' + y + '" width="1200" height="7" fill="' + shelf + '"/>';
+      for (var x = 6; x < 1194;) {
+        var w = 18 + r() * 30, h = 22 + r() * 36;
+        out += '<rect x="' + f(x) + '" y="' + f(y - h) + '" width="' + f(w) + '" height="' + f(h) + '" rx="2" fill="' +
+          colors[Math.floor(r() * colors.length)] + '"/>';
+        x += w + 4 + r() * 6;
+      }
+    }
+    return out;
+  }
+  function bars() {
+    var out = "";
+    for (var x = 20; x < 1200; x += 80) {
+      out += '<rect x="' + x + '" y="0" width="16" height="400" fill="#1b1f25"/>';
+      out += '<rect x="' + (x + 3) + '" y="0" width="3" height="400" fill="#59616b"/>';
+    }
+    out += '<rect x="0" y="40" width="1200" height="14" fill="#1b1f25"/><rect x="0" y="340" width="1200" height="14" fill="#1b1f25"/>';
+    return out;
+  }
+  function mullions() {
+    var out = "";
+    for (var x = 0; x <= 1200; x += 240) out += '<rect x="' + (x - 6) + '" y="0" width="12" height="400" fill="#e4e9ef"/>';
+    out += '<rect x="0" y="120" width="1200" height="10" fill="#e4e9ef"/>';
+    return out;
+  }
+  function busShelter() {
+    return '<rect x="760" y="250" width="8" height="150" fill="#2d3238"/><rect x="960" y="250" width="8" height="150" fill="#2d3238"/>' +
+      '<rect x="745" y="240" width="240" height="14" fill="#2d3238"/><rect x="768" y="254" width="192" height="110" fill="#cfe3f0" opacity=".35"/>' +
+      '<rect x="790" y="350" width="150" height="8" fill="#2d3238"/><rect x="1040" y="230" width="5" height="170" fill="#2d3238"/>' +
+      '<circle cx="1042" cy="226" r="20" fill="#2f6db5"/><rect x="1030" y="222" width="24" height="8" fill="#fff"/>';
+  }
+
+  var BOTTOM = "left bottom / auto 46vh repeat-x";
+  var TOP = "left top / auto 42vh repeat-x";
+  var SCENES = {
+    title: { sky: "linear-gradient(#1b1533 0%, #5b2a4a 55%, #e0765a 100%)",
+             top: stars(3, 70), art: skyline("#140e1e", "#ffcf7a", 11, 0.25) },
+    bedroom: { sky: "linear-gradient(#2a2340 0%, #a8556a 50%, #f2a65a 100%)",
+               art: skyline("#2a1f33", "#ffd08a", 5, 0.08, 120, 260) },
+    street: { sky: "linear-gradient(#5e8fc7 0%, #a9c7e3 60%, #e8d9c4 100%)",
+              art: skyline("#4a5a70", null, 8) },
+    bus: { sky: "linear-gradient(#7d8794 0%, #b3b9c0 60%, #d6d2c8 100%)",
+           art: skyline("#5d646e", null, 13, 0, 80, 240) + busShelter() },
+    shop: { sky: "linear-gradient(#3a2414 0%, #7a4a22 60%, #c98a40 100%)",
+            art: shelves(["#d94f3d", "#f2c14e", "#3d8bd9", "#5cc8a1", "#f4f1e8", "#9b59b6"], "#3a2414", 4),
+            size: "left bottom / auto 70vh repeat-x" },
+    office: { sky: "linear-gradient(#b8c7d8 0%, #e6edf4 100%)",
+              art: skyline("#9fb0c4", null, 17, 0, 140, 330) + mullions(),
+              size: "left bottom / auto 100vh repeat-x", ratio: "xMidYMax slice" },
+    night: { sky: "linear-gradient(#060914 0%, #141a33 60%, #2a2547 100%)",
+             top: stars(9, 90), art: skyline("#05070d", "#f5c66b", 2, 0.3) + streetlights("#000") },
+    home: { sky: "radial-gradient(circle at 70% 30%, #6b4a2f 0%, #3b2a1f 45%, #140d09 100%)",
+            art: skyline("#120c08", "#f0b060", 31, 0.15, 60, 180) },
+    car: { sky: "linear-gradient(#05060a 0%, #121524 60%, #3b1d24 100%)",
+           art: skyline("#08090f", "#c9a25a", 19, 0.12, 60, 200) + streetlights("#000") },
+    warehouse: { sky: "linear-gradient(#15181d 0%, #2e333b 60%, #4a4f57 100%)",
+                 art: shelves(["#8a6a43", "#a07a4d", "#6f5638", "#b28a57"], "#d17a1a", 27),
+                 size: "left bottom / auto 75vh repeat-x" },
+    gang: { sky: "linear-gradient(#0a0508 0%, #2a0d18 60%, #5a1624 100%)",
+            top: stars(14, 30, "#f6c"), art: skyline("#070306", "#b03a48", 23, 0.12) + streetlights("#000") },
+    suburb: { sky: "linear-gradient(#7fb8e8 0%, #cfe6f5 60%, #f4efd9 100%)", art: houses() },
+    struggle: { sky: "linear-gradient(#2b2b33 0%, #5a5560 60%, #9a8a7a 100%)",
+                art: skyline("#24222a", "#e0b060", 29, 0.12) },
+    prison: { sky: "linear-gradient(#2c3138 0%, #4a5059 60%, #6b7078 100%)",
+              art: bars(), size: "left top / auto 100vh repeat-x", ratio: "none" },
+    death: { sky: "radial-gradient(circle at 50% 75%, #3a3026 0%, #0b0908 55%, #000 100%)",
+             top: stars(41, 40) }
+  };
+
+  var layers = [], front = 0, curScene = null;
+  function cssFor(s) {
+    if (s.css) return s.css;
+    var parts = [];
+    if (s.top) parts.push(svgUrl(s.top, "xMidYMin slice") + " " + TOP);
+    if (s.art) parts.push(svgUrl(s.art, s.ratio) + " " + (s.size || BOTTOM));
+    parts.push(s.sky);
+    return (s.css = parts.join(", "));
+  }
+  function setScene(name) {
+    var s = SCENES[name];
+    if (!s || name === curScene) return;
+    curScene = name;
+    if (!layers.length) {
+      for (var i = 0; i < 2; i++) {
+        var d = document.createElement("div");
+        d.className = "scene-layer";
+        document.body.insertBefore(d, document.body.firstChild);
+        layers.push(d);
+      }
+    }
+    var back = layers[1 - front];
+    back.style.background = cssFor(s);
+    back.style.opacity = "1";
+    layers[front].style.opacity = "0";
+    front = 1 - front;
+  }
+
+  /* =================== MUSIC (original, generated live) =================== */
+  var MOODS = {
+    title: { bpm: 72, chords: [[45, 57, 60, 64, 67], [41, 57, 60, 64, 65], [48, 55, 60, 64, 67], [43, 55, 59, 62, 67]],
+      pad: { type: "triangle", vol: 0.05, cut: 1200, att: 0.8 }, bass: { type: "sine", vol: 0.12, pat: "x...............", len: 14 },
+      arp: { type: "sine", vol: 0.05, pat: "x...x...x...x...", oct: 1, len: 3 } },
+    morning: { bpm: 80, chords: [[41, 53, 57, 60, 64], [40, 52, 55, 59, 62], [38, 50, 53, 57, 60], [36, 52, 55, 59, 64]],
+      pad: { type: "triangle", vol: 0.04, cut: 1500, att: 0.4 }, bass: { type: "sine", vol: 0.14, pat: "x.......x.x....." },
+      arp: { type: "triangle", vol: 0.045, pat: "x..x..x...x..x..", oct: 1, cut: 2200 },
+      drums: { k: "x.........x.....", s: "....x.......x...", h: "x.x.x.x.x.x.x.x.", kv: 0.35, sv: 0.08, hv: 0.025 } },
+    street: { bpm: 90, chords: [[36, 55, 58, 60, 63], [41, 56, 60, 63, 65], [44, 55, 60, 63, 67], [43, 55, 59, 62, 65]],
+      pad: { type: "triangle", vol: 0.035, cut: 1100, att: 0.3 }, bass: { type: "sine", vol: 0.17, pat: "x......x..x....." },
+      arp: { type: "square", vol: 0.018, pat: "x.....x.....x...", oct: 1, cut: 1600 },
+      drums: { k: "x......x..x.....", s: "....x.......x...", h: "x.x.x.x.x.x.x.x.", kv: 0.5, sv: 0.12, hv: 0.035 } },
+    tense: { bpm: 104, chords: [[38, 50, 53, 57], [38, 50, 53, 58], [38, 50, 53, 57], [37, 49, 53, 56]],
+      pad: { type: "sawtooth", vol: 0.025, cut: 700, att: 0.5 }, bass: { type: "sawtooth", vol: 0.07, pat: "x.x.x.x.x.x.x.x.", cut: 380, len: 1.5 },
+      drums: { k: "x.......x.......", h: "xxxxxxxxxxxxxxxx", kv: 0.45, hv: 0.02 } },
+    work: { bpm: 112, chords: [[48, 60, 64, 67], [45, 57, 60, 64], [41, 57, 60, 65], [43, 55, 59, 62]],
+      pad: { type: "sine", vol: 0.03, cut: 2000, att: 0.3 },
+      arp: { type: "square", vol: 0.014, pat: "x.x.x.x.x.x.x.x.", oct: 1, cut: 2500, len: 1 },
+      drums: { h: "..x...x...x...x.", hv: 0.02 } },
+    night: { bpm: 68, chords: [[39, 54, 58, 61, 65], [35, 54, 58, 61, 63], [32, 51, 54, 58, 61], [34, 53, 56, 61, 62]],
+      pad: { type: "triangle", vol: 0.05, cut: 900, att: 1 }, bass: { type: "sine", vol: 0.14, pat: "x.......x......." },
+      arp: { type: "sine", vol: 0.035, pat: "x.....x.........", oct: 1, len: 4 },
+      drums: { k: "x...............", kv: 0.3 } },
+    suburb: { bpm: 98, chords: [[38, 54, 57, 62, 66], [45, 52, 57, 61, 64], [47, 54, 59, 62, 66], [43, 55, 59, 62, 67]],
+      pad: { type: "sine", vol: 0.04, cut: 2400, att: 0.3 }, bass: { type: "sine", vol: 0.14, pat: "x...x...x...x..." },
+      arp: { type: "triangle", vol: 0.045, pat: "x.xxx.x.x.xxx.x.", oct: 1, cut: 3200, len: 1.5 },
+      drums: { k: "x.......x.......", s: "....x.......x...", h: "..x...x...x...x.", kv: 0.4, sv: 0.1, hv: 0.03 } },
+    struggle: { bpm: 64, chords: [[43, 55, 58, 62], [39, 55, 58, 63], [36, 55, 60, 63], [38, 54, 57, 60, 62]],
+      pad: { type: "triangle", vol: 0.05, cut: 1000, att: 0.6 }, bass: { type: "sine", vol: 0.15, pat: "x.........x....." },
+      arp: { type: "sine", vol: 0.04, pat: "x.....x.....x...", oct: 1, len: 3 },
+      drums: { k: "x.........x.....", s: "....x.......x...", kv: 0.35, sv: 0.08 } },
+    prison: { bpm: 52, chords: [[33, 45, 52], [33, 45, 51], [33, 45, 52], [32, 44, 51]],
+      pad: { type: "sawtooth", vol: 0.025, cut: 420, att: 1.2 }, bass: { type: "sine", vol: 0.12, pat: "x...............", len: 14 },
+      metal: { pat: "x.......", note: 84 } },
+    gang: { bpm: 70, chords: [[41, 56, 60, 65], [37, 56, 61, 65], [44, 56, 60, 63], [36, 55, 60, 64]],
+      pad: { type: "sawtooth", vol: 0.02, cut: 600, att: 0.5 }, bass: { type: "sine", vol: 0.24, pat: "x.....x...x.....", len: 5, cut: 300 },
+      arp: { type: "square", vol: 0.016, pat: "x.......x.......", oct: 1, cut: 1200, len: 2 },
+      drums: { k: "x.....x...x.....", s: "........x.......", h: "x.x.x.x.xxx.x.x.", kv: 0.55, sv: 0.14, hv: 0.03 } },
+    death: { bpm: 48, chords: [[45, 57, 64], [41, 57, 60], [45, 57, 64], [40, 56, 59]],
+      pad: { type: "sine", vol: 0.045, cut: 1200, att: 1.6 },
+      arp: { type: "sine", vol: 0.04, pat: "x...............", oct: 1, len: 8 } }
+  };
+
+  var ctx = null, bus = null, noise = null, mood = null, pendingMood = "title";
+  var step = 0, nextTime = 0, arpIndex = 0, muted = false, VOL = 0.9;
+  try { muted = localStorage.getItem("dayLifeMuted") === "1"; } catch (e) {}
+
+  function hz(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+  function voice(freq, t, dur, type, vol, cut, att) {
+    var o = ctx.createOscillator(), g = ctx.createGain(), fl = ctx.createBiquadFilter();
+    o.type = type; o.frequency.value = freq;
+    fl.type = "lowpass"; fl.frequency.value = cut || 2000;
+    att = Math.min(att || 0.01, dur * 0.5);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(vol, t + att);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(fl); fl.connect(g); g.connect(bus);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  function kick(t, v) {
+    var o = ctx.createOscillator(), g = ctx.createGain();
+    o.frequency.setValueAtTime(130, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.14);
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+    o.connect(g); g.connect(bus); o.start(t); o.stop(t + 0.4);
+  }
+  function noiseHit(t, v, hp, dur) {
+    var s = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), g = ctx.createGain();
+    s.buffer = noise; fl.type = "highpass"; fl.frequency.value = hp;
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(fl); fl.connect(g); g.connect(bus); s.start(t); s.stop(t + dur + 0.02);
+  }
+  function metal(t, note) {
+    voice(hz(note), t, 1.6, "square", 0.012, 5000, 0.002);
+    voice(hz(note) * 1.414, t, 1.2, "sine", 0.02, 6000, 0.002);
+  }
+  function playStep(m, st, t, s16) {
+    var bar = Math.floor(st / 16), i = st % 16, ch = m.chords[bar % m.chords.length], root = ch[0], notes = ch.slice(1);
+    if (i === 0 && m.pad) notes.forEach(function (n) { voice(hz(n), t, s16 * 16 * 1.05, m.pad.type, m.pad.vol, m.pad.cut, m.pad.att); });
+    if (m.bass && m.bass.pat[i] === "x") voice(hz(root), t, s16 * (m.bass.len || 3), m.bass.type, m.bass.vol, m.bass.cut || 600, 0.01);
+    if (m.arp && m.arp.pat[i] === "x") {
+      arpIndex++;
+      voice(hz(notes[arpIndex % notes.length] + 12 * (m.arp.oct || 0)), t, s16 * (m.arp.len || 2), m.arp.type, m.arp.vol, m.arp.cut || 2000, 0.005);
+    }
+    if (m.metal && m.metal.pat[i % m.metal.pat.length] === "x" && i % 8 === 0 && bar % 2 === 0) metal(t, m.metal.note);
+    var d = m.drums;
+    if (d) {
+      if (d.k && d.k[i] === "x") kick(t, d.kv || 0.4);
+      if (d.s && d.s[i] === "x") noiseHit(t, d.sv || 0.1, 1500, 0.16);
+      if (d.h && d.h[i] === "x") noiseHit(t, d.hv || 0.03, 7000, 0.04);
+    }
+  }
+  function schedule() {
+    if (!ctx || !mood) return;
+    var m = MOODS[mood], s16 = 60 / m.bpm / 4;
+    if (nextTime < ctx.currentTime) nextTime = ctx.currentTime + 0.05;
+    while (nextTime < ctx.currentTime + 0.15) {
+      playStep(m, step, nextTime, s16);
+      nextTime += s16;
+      step = (step + 1) % (16 * m.chords.length);
+    }
+  }
+  function setMood(name) {
+    pendingMood = name;
+    if (!ctx || name === mood || !MOODS[name]) return;
+    var now = ctx.currentTime;
+    bus.gain.cancelScheduledValues(now);
+    bus.gain.setValueAtTime(bus.gain.value, now);
+    bus.gain.linearRampToValueAtTime(0.0001, now + 0.6);
+    setTimeout(function () {
+      mood = pendingMood; step = 0; arpIndex = 0; nextTime = ctx.currentTime + 0.05;
+      var t = ctx.currentTime;
+      bus.gain.cancelScheduledValues(t);
+      bus.gain.setValueAtTime(0.0001, t);
+      bus.gain.linearRampToValueAtTime(VOL, t + 1.2);
+    }, 650);
+  }
+  function startAudio() {
+    if (ctx || muted) return;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    ctx = new AC();
+    var comp = ctx.createDynamicsCompressor();
+    comp.connect(ctx.destination);
+    bus = ctx.createGain(); bus.gain.value = 0.0001; bus.connect(comp);
+    var delay = ctx.createDelay(1), fb = ctx.createGain(), wet = ctx.createGain();
+    delay.delayTime.value = 0.34; fb.gain.value = 0.3; wet.gain.value = 0.22;
+    bus.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(comp);
+    noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    var data = noise.getChannelData(0);
+    for (var i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    setInterval(schedule, 25);
+    var want = pendingMood; mood = null; setMood(want);
+  }
+
+  /* =================== MUTE BUTTON =================== */
+  var btn = document.createElement("button");
+  btn.id = "music-toggle";
+  function label() { btn.textContent = muted ? "♪ Music off" : "♪ Music on"; btn.setAttribute("aria-pressed", String(!muted)); }
+  btn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    muted = !muted;
+    try { localStorage.setItem("dayLifeMuted", muted ? "1" : "0"); } catch (err) {}
+    if (muted) { if (ctx) ctx.suspend(); }
+    else if (!ctx) startAudio();
+    else ctx.resume();
+    label();
+  });
+  label();
+  document.body.appendChild(btn);
+
+  ["pointerdown", "keydown"].forEach(function (ev) {
+    document.addEventListener(ev, function () {
+      if (!muted) { startAudio(); if (ctx && ctx.state === "suspended") ctx.resume(); }
+    }, true);
+  });
+
+  /* =================== WATCH THE CURRENT PASSAGE'S TAGS =================== */
+  var lastTags = null;
+  function currentTags() {
+    var story = document.querySelector("tw-story");
+    return story ? (story.getAttribute("tags") || "") : null;
+  }
+  setInterval(function () {
+    var tags = currentTags();
+    if (tags === null || tags === lastTags) return;
+    lastTags = tags;
+    tags.split(/\s+/).forEach(function (t) {
+      if (t.indexOf("scene-") === 0) setScene(t.slice(6));
+      if (t.indexOf("music-") === 0) setMood(t.slice(6));
+    });
+  }, 150);
+})();
