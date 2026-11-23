@@ -76,6 +76,16 @@ tw-link:hover, .enchantment-link:hover { background: rgba(255, 197, 107, 0.22); 
 .title-card { text-align: center; margin: 0.5rem 0 1.5rem; }
 .title-card h1 { font-size: 2.4rem; line-height: 1.1; margin: 0 0 0.4rem; letter-spacing: 0.01em; }
 .tagline { margin: 0; opacity: 0.75; font-style: italic; }
+.name-box { margin: 1.25rem 0 1rem; }
+.name-box label { display: block; font: 700 0.8rem/1.2 system-ui, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85; margin-bottom: 0.4rem; }
+.name-box input {
+  width: 100%; max-width: 22rem; box-sizing: border-box; padding: 0.55rem 0.75rem;
+  font: inherit; color: #f3ede4; background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 197, 107, 0.5); border-radius: 8px;
+}
+.name-box tw-expression[name="input"] { margin-left: 0 !important; width: 100% !important; max-width: 22rem; border: none !important; padding: 0 !important; }
+.name-box input:focus { outline: 2px solid #ffc56b; outline-offset: 1px; }
+.name-box small { display: block; margin-top: 0.35rem; font-size: 0.8rem; opacity: 0.6; }
 .hint { display: block; margin-top: 1rem; font-size: 0.85rem; opacity: 0.6; }
 
 .ending-label {
@@ -441,6 +451,7 @@ tw-link:hover, .enchantment-link:hover { background: rgba(255, 197, 107, 0.22); 
     });
   }, 150);
 })();</script><tw-passagedata pid="1" name="SYS Init" tags="startup" position="100,100" size="100,100">{
+(set: $name to &quot;Jordan&quot;)
 (set: $health to 70)
 (set: $energy to 70)
 (set: $happiness to 55)
@@ -513,21 +524,28 @@ tw-link:hover, .enchantment-link:hover { background: rgba(255, 197, 107, 0.22); 
 }</tw-passagedata><tw-passagedata pid="4" name="SYS Ending Footer" tags="" position="625,100" size="100,100">&lt;div class=&quot;recap&quot;&gt;&#39;&#39;How you got here&#39;&#39;(for: each _entry, ...$log)[&lt;br&gt;· _entry]&lt;/div&gt;
 (display: &quot;SYS Gallery&quot;)
 (link: &quot;Play again&quot;)[(restart:)]</tw-passagedata><tw-passagedata pid="5" name="TITLE" tags="nohud scene-title music-title" position="100,275" size="100,100">&lt;div class=&quot;title-card&quot;&gt;&lt;h1&gt;A Day in the Life&lt;/h1&gt;&lt;p class=&quot;tagline&quot;&gt;One morning. One city. Every choice weighs something.&lt;/p&gt;&lt;/div&gt;
-You are Jordan, twenty-four. You&#39;ve got a job downtown, a mother across town, a cousin with offers, and four things you can&#39;t stop counting: &#39;&#39;health&#39;&#39;, &#39;&#39;energy&#39;&#39;, &#39;&#39;happiness&#39;&#39;, and &#39;&#39;money&#39;&#39;.
+You&#39;re twenty-four. You&#39;ve got a job downtown, a mother across town, a cousin with offers, and four things you can&#39;t stop counting: &#39;&#39;health&#39;&#39;, &#39;&#39;energy&#39;&#39;, &#39;&#39;happiness&#39;&#39;, and &#39;&#39;money&#39;&#39;.
 
 Some days decide whole lives. Five lives can grow out of this one. Play it again and again to find them all.
 
 (display: &quot;SYS Gallery&quot;)
+{(if: (saved-games:) contains &quot;player-name&quot;)[(set: $name to (saved-games:)&#39;s &quot;player-name&quot;)]}
+&lt;div class=&quot;name-box&quot;&gt;&lt;label&gt;Your name&lt;/label&gt;(input: bind $name, &quot;=XXXXXX=&quot;, $name)&lt;small&gt;Type any name, or keep the default.&lt;/small&gt;&lt;/div&gt;
 [[Begin the day-&gt;M01 Alarm]]
 
-&lt;span class=&quot;hint&quot;&gt;Music starts when you tap. Use the ♪ button to mute.&lt;/span&gt;</tw-passagedata><tw-passagedata pid="6" name="M01 Alarm" tags="scene-bedroom music-morning" position="100,450" size="100,100">{(set: $clock to &quot;6:42 AM&quot;)}
+&lt;span class=&quot;hint&quot;&gt;Music starts when you tap. Use the ♪ button to mute.&lt;/span&gt;</tw-passagedata><tw-passagedata pid="6" name="M01 Alarm" tags="scene-bedroom music-morning" position="100,450" size="100,100">{
+(set: $clock to &quot;6:42 AM&quot;)
+(set: $name to (trimmed: $name))
+(if: $name is &quot;&quot;)[(set: $name to &quot;Jordan&quot;)]
+(set: _savedName to (save-game: &quot;player-name&quot;, $name))
+}
 The alarm cuts through a dream you can&#39;t hold onto.
 
 Today is the presentation, the one your manager called &quot;a real opportunity to get some visibility.&quot; You&#39;ve rehearsed it in the shower all week.
 
 Your phone lights up on the nightstand. Two messages.
 
-&#39;&#39;Mom:&#39;&#39; //Pharmacy says my insurance lapsed. Don&#39;t worry about it baby, I&#39;ll figure it out. Good luck today!!//
+&#39;&#39;Mom:&#39;&#39; //Pharmacy says my insurance lapsed. Don&#39;t worry about it baby, I&#39;ll figure it out. Good luck today (verbatim-print: $name)!!//
 
 &#39;&#39;Dre:&#39;&#39; //yo cuz. got something easy tonight. five hundred cash. hit me//
 
@@ -672,7 +690,7 @@ There&#39;s a new security guard. He follows you from the coffee to the snacks t
 }
 &quot;Is there a problem?&quot;
 
-He stiffens. Before he can answer, Mr. Kim leans over the counter. &quot;Jordan? Been coming here since grade school. Go watch the door.&quot;
+He stiffens. Before he can answer, Mr. Kim leans over the counter. &quot;(verbatim-print: $name)? Been coming here since grade school. Go watch the door.&quot;
 
 The guard mumbles something that might be an apology. You&#39;ll take it.
 
@@ -706,7 +724,7 @@ Conference Room B. Twelve chairs. You are the only person in the room who looks 
 
 Afterward, Kyle from your team repeats your main idea back to the room like it just occurred to him.
 
-&quot;Great point, Kyle,&quot; says Greg. Then, to you, warmly: &quot;And hey, very articulate today.&quot;
+&quot;Great point, Kyle,&quot; says Greg. Then, to you, warmly: &quot;And hey, (verbatim-print: $name), very articulate today.&quot;
 
 [[Correct the record, politely-&gt;W03 Speak Up]]
 [[Let it slide-&gt;W03 Let It Slide]]</tw-passagedata><tw-passagedata pid="22" name="W03 Speak Up" tags="scene-office music-work" position="450,800" size="100,100">{
@@ -784,7 +802,7 @@ You read it four times.]
 [[Head home-&gt;E00 Walk Home]]</tw-passagedata><tw-passagedata pid="28" name="E01 Evening" tags="scene-night music-night" position="100,975" size="100,100">{(set: $clock to &quot;6:40 PM&quot;)}
 Dre is leaning on a black Charger outside the laundromat like he&#39;s been waiting for you specifically. He has.
 
-&quot;Cuz! You get my text?&quot;
+&quot;(verbatim-print: $name)! Cuz! You get my text?&quot;
 
 The job: drive a backpack across town to a man on Fulton Street. Use his other car, the gray Camry. One hour. Five hundred dollars.
 
@@ -1044,7 +1062,7 @@ He holds out the keys. &quot;So?&quot;
 [[Take the job-&gt;E02 The Run]]
 [[“Not tonight, Dre.”-&gt;E02 Turn It Down]]</tw-passagedata><tw-passagedata pid="52" name="END Excellence" tags="ending scene-suburb music-suburb" position="3075,975" size="100,100">{(set: $clock to &quot;&quot;)(set: _saved to (save-game: &quot;ending-suburban&quot;, &quot;Excellence&quot;))}
 &lt;div class=&quot;ending-label&quot;&gt;Ending · Excellence&lt;/div&gt;
-Six weeks later, the email says //Congratulations//. Two years after that, a title with &quot;Manager&quot; in it. Five years after that, a house with a lawn, on a street named after the trees they cut down to build it.
+Six weeks later, the email says //Congratulations, (verbatim-print: $name).// Two years after that, a title with &quot;Manager&quot; in it. Five years after that, a house with a lawn, on a street named after the trees they cut down to build it.
 
 Mom visits on Sundays and says the quiet takes getting used to. You paid off her prescriptions the first month and never let her mention them again.
 
@@ -1100,7 +1118,7 @@ You found family. It just never stopped asking for more.
 &lt;div class=&quot;ending-label&quot;&gt;Ending · Gone Too Soon&lt;/div&gt;
 (if: $choices&#39;s route is &quot;gang&quot;)[You step forward. Everything after happens faster than thinking. The sound is smaller than it is in movies.
 
-Then there&#39;s only the sky, orange from the streetlights, and Dre&#39;s voice getting very far away, saying your name like he&#39;s trying to keep you from leaving.]
+Then there&#39;s only the sky, orange from the streetlights, and Dre&#39;s voice getting very far away, saying &quot;(verbatim-print: $name)&quot; like he&#39;s trying to keep you from leaving.]
 (else:)[You push through. The tightness becomes a fist. Luis finds you between the racks at Dock 9.
 
 The doctors say heart. They say stress. They say you should have come in sooner. Nobody mentions what coming in sooner would have cost.]
