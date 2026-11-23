@@ -14,6 +14,7 @@ A Day in the Life
 
 :: SYS Init [startup]
 {
+(set: $name to "Jordan")
 (set: $health to 70)
 (set: $energy to 70)
 (set: $happiness to 55)
@@ -102,25 +103,32 @@ A Day in the Life
 
 :: TITLE [nohud scene-title music-title]
 <div class="title-card"><h1>A Day in the Life</h1><p class="tagline">One morning. One city. Every choice weighs something.</p></div>
-You are Jordan, twenty-four. You've got a job downtown, a mother across town, a cousin with offers, and four things you can't stop counting: ''health'', ''energy'', ''happiness'', and ''money''.
+You're twenty-four. You've got a job downtown, a mother across town, a cousin with offers, and four things you can't stop counting: ''health'', ''energy'', ''happiness'', and ''money''.
 
 Some days decide whole lives. Five lives can grow out of this one. Play it again and again to find them all.
 
 (display: "SYS Gallery")
+{(if: (saved-games:) contains "player-name")[(set: $name to (saved-games:)'s "player-name")]}
+<div class="name-box"><label>Your name</label>(input: bind $name, "=XXXXXX=", $name)<small>Type any name, or keep the default.</small></div>
 [[Begin the day->M01 Alarm]]
 
 <span class="hint">Music starts when you tap. Use the ♪ button to mute.</span>
 
 
 :: M01 Alarm [scene-bedroom music-morning]
-{(set: $clock to "6:42 AM")}
+{
+(set: $clock to "6:42 AM")
+(set: $name to (trimmed: $name))
+(if: $name is "")[(set: $name to "Jordan")]
+(set: _savedName to (save-game: "player-name", $name))
+}
 The alarm cuts through a dream you can't hold onto.
 
 Today is the presentation, the one your manager called "a real opportunity to get some visibility." You've rehearsed it in the shower all week.
 
 Your phone lights up on the nightstand. Two messages.
 
-''Mom:'' //Pharmacy says my insurance lapsed. Don't worry about it baby, I'll figure it out. Good luck today!!//
+''Mom:'' //Pharmacy says my insurance lapsed. Don't worry about it baby, I'll figure it out. Good luck today (verbatim-print: $name)!!//
 
 ''Dre:'' //yo cuz. got something easy tonight. five hundred cash. hit me//
 
@@ -313,7 +321,7 @@ There's a new security guard. He follows you from the coffee to the snacks to th
 }
 "Is there a problem?"
 
-He stiffens. Before he can answer, Mr. Kim leans over the counter. "Jordan? Been coming here since grade school. Go watch the door."
+He stiffens. Before he can answer, Mr. Kim leans over the counter. "(verbatim-print: $name)? Been coming here since grade school. Go watch the door."
 
 The guard mumbles something that might be an apology. You'll take it.
 
@@ -359,7 +367,7 @@ Conference Room B. Twelve chairs. You are the only person in the room who looks 
 
 Afterward, Kyle from your team repeats your main idea back to the room like it just occurred to him.
 
-"Great point, Kyle," says Greg. Then, to you, warmly: "And hey, very articulate today."
+"Great point, Kyle," says Greg. Then, to you, warmly: "And hey, (verbatim-print: $name), very articulate today."
 
 [[Correct the record, politely->W03 Speak Up]]
 [[Let it slide->W03 Let It Slide]]
@@ -465,7 +473,7 @@ You read it four times.]
 {(set: $clock to "6:40 PM")}
 Dre is leaning on a black Charger outside the laundromat like he's been waiting for you specifically. He has.
 
-"Cuz! You get my text?"
+"(verbatim-print: $name)! Cuz! You get my text?"
 
 The job: drive a backpack across town to a man on Fulton Street. Use his other car, the gray Camry. One hour. Five hundred dollars.
 
@@ -821,7 +829,7 @@ He holds out the keys. "So?"
 :: END Excellence [ending scene-suburb music-suburb]
 {(set: $clock to "")(set: _saved to (save-game: "ending-suburban", "Excellence"))}
 <div class="ending-label">Ending · Excellence</div>
-Six weeks later, the email says //Congratulations//. Two years after that, a title with "Manager" in it. Five years after that, a house with a lawn, on a street named after the trees they cut down to build it.
+Six weeks later, the email says //Congratulations, (verbatim-print: $name).// Two years after that, a title with "Manager" in it. Five years after that, a house with a lawn, on a street named after the trees they cut down to build it.
 
 Mom visits on Sundays and says the quiet takes getting used to. You paid off her prescriptions the first month and never let her mention them again.
 
@@ -893,7 +901,7 @@ You found family. It just never stopped asking for more.
 <div class="ending-label">Ending · Gone Too Soon</div>
 (if: $choices's route is "gang")[You step forward. Everything after happens faster than thinking. The sound is smaller than it is in movies.
 
-Then there's only the sky, orange from the streetlights, and Dre's voice getting very far away, saying your name like he's trying to keep you from leaving.]
+Then there's only the sky, orange from the streetlights, and Dre's voice getting very far away, saying "(verbatim-print: $name)" like he's trying to keep you from leaving.]
 (else:)[You push through. The tightness becomes a fist. Luis finds you between the racks at Dock 9.
 
 The doctors say heart. They say stress. They say you should have come in sooner. Nobody mentions what coming in sooner would have cost.]
@@ -975,6 +983,16 @@ tw-link:hover, .enchantment-link:hover { background: rgba(255, 197, 107, 0.22); 
 .title-card { text-align: center; margin: 0.5rem 0 1.5rem; }
 .title-card h1 { font-size: 2.4rem; line-height: 1.1; margin: 0 0 0.4rem; letter-spacing: 0.01em; }
 .tagline { margin: 0; opacity: 0.75; font-style: italic; }
+.name-box { margin: 1.25rem 0 1rem; }
+.name-box label { display: block; font: 700 0.8rem/1.2 system-ui, sans-serif; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85; margin-bottom: 0.4rem; }
+.name-box input {
+  width: 100%; max-width: 22rem; box-sizing: border-box; padding: 0.55rem 0.75rem;
+  font: inherit; color: #f3ede4; background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 197, 107, 0.5); border-radius: 8px;
+}
+.name-box tw-expression[name="input"] { margin-left: 0 !important; width: 100% !important; max-width: 22rem; border: none !important; padding: 0 !important; }
+.name-box input:focus { outline: 2px solid #ffc56b; outline-offset: 1px; }
+.name-box small { display: block; margin-top: 0.35rem; font-size: 0.8rem; opacity: 0.6; }
 .hint { display: block; margin-top: 1rem; font-size: 0.85rem; opacity: 0.6; }
 
 .ending-label {

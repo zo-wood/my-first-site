@@ -64,6 +64,15 @@ A choice's effects go at the top of the passage that choice leads to:
 }
 ```
 
+### Player's name
+
+The title screen has a name box bound to `$name` (it defaults to "Jordan"). The name is remembered between plays because it's stored as the label of a save slot called `player-name`. To show it in text, use `(verbatim-print: $name)` so a name containing symbols can't break Harlowe markup:
+
+```harlowe
+(input: bind $name, "=XXXXXX=", $name)
+''Mom:'' //Good luck today (verbatim-print: $name)!!//
+```
+
 ### Text that changes based on earlier choices
 
 ```harlowe
